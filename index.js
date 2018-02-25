@@ -32,124 +32,82 @@ function buffer(hex) {
 	}
 }
 
+class TrezorProvider {
+	constructor(url, path) {
+		var self = this;
+		this.url = url;
+		this.path = path;
+		this.list = new trezor.DeviceList({debug: debug});
+		this.list.on('connect', function (device) {
+	        if (debug) {
+	            console.log('Connected a device:', device);
+	            console.log('Devices:', this.list.asArray());
+	        }
+	        console.log("Connected device " + device.features.label);
 
-/**
- * @param {string}
- */
-function buttonCallback(label, code) {
-    if (debug) {
-        // We can (but don't necessarily have to) show something to the user, such
-        // as 'look at your device'.
-        // Codes are in the format ButtonRequest_[type] where [type] is one of the
-        // types, defined here:
-        // https://github.com/trezor/trezor-common/blob/master/protob/types.proto#L78-L89
-        console.log('User is now asked for an action on device', code);
-    }
-    console.log("Look at device " + label + " and press the button, human.");
-}
+		    device.on('pin', (type, callback) => {
+		        console.error("Entering pin is not supported. Unlock TREZOR in other app!");
+		        callback(new Error());
+		    });
 
-/**
- * @param {Function<Error, string>} callback
- */
-function passphraseCallback(callback) {
-    console.log('Please enter passphrase.');
+	        // For convenience, device emits 'disconnect' event on disconnection.
+	        device.on('disconnect', function () {
+	            console.log("Disconnected device");
+	        });
 
-    // note - disconnecting the device should trigger process.stdin.pause too, but that
-    // would complicate the code
+	        // You generally want to filter out devices connected in bootloader mode:
+	        if (device.isBootloader()) {
+	            throw new Error('Device is in bootloader mode, re-connected it');
+	        }
 
-    // we would need to pass device in the function and call device.on('disconnect', ...
-
-    process.stdin.resume();
-    process.stdin.on('data', function (buffer) {
-        var text = buffer.toString().replace(/\n$/, "");
-        process.stdin.pause();
-        callback(null, text);
-    });
-}
-
-var list;
-var dev;
-
-// you should do this to release devices on exit
-function TrezorProvider(provider_url, path) {
-	list = new trezor.DeviceList({debug: debug});
-	list.on('connect', function (device) {
-		dev = device;
-        if (debug) {
-            console.log('Connected a device:', device);
-            console.log('Devices:', list.asArray());
-        }
-        console.log("Connected device " + device.features.label);
-
-	    device.on('pin', (type, callback) => {
-	        console.error("Entering pin is not supported. Unlock TREZOR in other app!");
-	        callback(new Error());
 	    });
 
-        // For convenience, device emits 'disconnect' event on disconnection.
-        device.on('disconnect', function () {
-            console.log("Disconnected device");
-            dev = null;
-        });
+		this.engine = new ProviderEngine();
+		this.engine.addProvider(new HookedSubprovider({
+			getAccounts: function(cb) {
+			    self.inTrezorSession(
+			        session => session.ethereumGetAddress(path, false)
+			    )
+			    .then(resp => "0x" + resp.message.address)
+			    .then(address => {cb(null, [address]); console.log("address: " + address)})
+			    .catch(cb);
+			},
+			signTransaction: function(txParams, cb) {
+				self.inTrezorSession(
+					session => session.signEthTx(path, normalize(txParams.nonce), normalize(txParams.gasPrice), normalize(txParams.gas), normalize(txParams.to), normalize(txParams.value), normalize(txParams.data))
+				)
+				.then(result => {
+					var tx = new Transaction({
+					   nonce: buffer(txParams.nonce),
+					   gasPrice: buffer(txParams.gasPrice),
+					   gasLimit: buffer(txParams.gas),
+					   to: buffer(txParams.to),
+					   value: buffer(txParams.value),
+					   data: buffer(txParams.data),
+					   v: result.v,
+					   r: buffer(result.r),
+					   s: buffer(result.s)
+					});
+					cb(null, '0x' + tx.serialize().toString('hex'));
+				})
+				.catch(cb);
+			}
+		}));
+		this.engine.addProvider(new FiltersSubprovider());
+		this.engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(url)));
+		this.engine.start(); // Required by the provider engine.
+	}
 
-        // You generally want to filter out devices connected in bootloader mode:
-        if (device.isBootloader()) {
-            throw new Error('Device is in bootloader mode, re-connected it');
+	inTrezorSession(cb) {
+		var devices = this.list.asArray();
+        if (devices.length == 0) {
+            return Promise.reject(new Error("no device connected"));
+        } else {
+            return devices[0].waitForSessionAndRun(cb);
         }
+    }
 
-    });
-
-    list.on('error', function (error) {
-        //console.error('List error:', error);
-    });
-
-    process.on('exit', function() {
-        list.onbeforeunload();
-    });
-
-	function inTrezorSession(cb) {
-		if (dev == null) {
-			return Promise.reject(new Error("no device connected"));
-		} else {
-		    return dev.waitForSessionAndRun(cb);
-		}
-	}
-
-	this.engine = new ProviderEngine();
-	this.engine.addProvider(new HookedSubprovider({
-	getAccounts: function(cb) {
-	    inTrezorSession(
-	        session => session.ethereumGetAddress(path, false)
-	    )
-	    .then(resp => "0x" + resp.message.address)
-	    .then(address => {cb(null, [address]); console.log("address: " + address)})
-	    .catch(cb);
-	},
-	signTransaction: function(txParams, cb) {
-		inTrezorSession(
-			session => session.signEthTx(path, normalize(txParams.nonce), normalize(txParams.gasPrice), normalize(txParams.gas), normalize(txParams.to), normalize(txParams.value), normalize(txParams.data))
-		)
-		.then(result => {
-			var tx = new Transaction({
-			   nonce: buffer(txParams.nonce),
-			   gasPrice: buffer(txParams.gasPrice),
-			   gasLimit: buffer(txParams.gas),
-			   to: buffer(txParams.to),
-			   value: buffer(txParams.value),
-			   data: buffer(txParams.data),
-			   v: result.v,
-			   r: buffer(result.r),
-			   s: buffer(result.s)
-			});
-			cb(null, '0x' + tx.serialize().toString('hex'));
-		})
-		.catch(cb);
-	}
-	}));
-	this.engine.addProvider(new FiltersSubprovider());
-	this.engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(provider_url)));
-	this.engine.start(); // Required by the provider engine.
-};
+}
 
 TrezorProvider.prototype.sendAsync = function() {
   this.engine.sendAsync.apply(this.engine, arguments);
