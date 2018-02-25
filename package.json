@@ -1,32 +1,30 @@
 {
-  "name": "truffle-hdwallet-provider",
-  "version": "0.0.3",
-  "description": "HD Wallet-enabled Web3 provider",
+  "name": "truffle-trezor-provider",
+  "version": "0.0.1",
+  "description": "Trezor-enabled Web3 provider",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trufflesuite/truffle-hdwallet-provider.git"
+    "url": "git+https://github.com/0v1se/truffle-trezor-provider.git"
   },
   "keywords": [
-    "etheruem",
-    "hd",
+    "ethereum",
+    "trezor",
     "wallet",
-    "mnemonic",
     "provider"
   ],
-  "author": "Tim Coulter <tim.coulter@consensys.net>",
+  "author": "0v1se <dev@0v1se.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/trufflesuite/truffle-hdwallet-provider/issues"
+    "url": "https://github.com/0v1se/truffle-trezor-provider/issues"
   },
-  "homepage": "https://github.com/trufflesuite/truffle-hdwallet-provider#readme",
+  "homepage": "https://github.com/0v1se/truffle-trezor-provider#readme",
   "dependencies": {
-    "bip39": "^2.2.0",
-    "ethereumjs-wallet": "^0.6.0",
     "web3": "^0.18.2",
-    "web3-provider-engine": "^8.4.0"
+    "web3-provider-engine": "^8.4.0",
+    "trezor.js-node": "^5.4.3"
   }
 }
