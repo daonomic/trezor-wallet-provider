@@ -1,6 +1,6 @@
 {
-  "name": "truffle-trezor-provider",
-  "version": "0.0.1",
+  "name": "trezor-wallet-provider",
+  "version": "0.0.2",
   "description": "Trezor-enabled Web3 provider",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/0v1se/truffle-trezor-provider#readme",
   "dependencies": {
-    "web3": "^0.18.2",
     "web3-provider-engine": "^8.4.0",
     "trezor.js-node": "^5.4.3"
   }
