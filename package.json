@@ -24,6 +24,7 @@
   "homepage": "https://github.com/0v1se/truffle-trezor-provider#readme",
   "dependencies": {
     "web3-provider-engine": "^8.4.0",
-    "trezor.js-node": "^5.4.3"
+    "trezor.js-node": "^5.4.3",
+    "bip32-path": "^0.4.2"
   }
 }

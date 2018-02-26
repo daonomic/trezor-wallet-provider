@@ -4,6 +4,7 @@ var HookedSubprovider = require('web3-provider-engine/subproviders/hooked-wallet
 var Transaction = require('ethereumjs-tx');
 var trezor = require('trezor.js-node');
 var util = require('util');
+var bippath = require('bip32-path')
 
 var debug = false;
 
@@ -28,14 +29,19 @@ function buffer(hex) {
 	}
 }
 
+var trezorInstance;
+
 class Trezor {
 	constructor(path) {
 		var self = this;
 
+		this.devices = [];
 		this.path = path;
 		this.list = new trezor.DeviceList({debug: debug});
 		this.list.on('connect', function (device) {
+			var dev = device;
 	        console.log("Connected device " + device.features.label);
+	        self.devices.push(device);
 
 		    device.on('pin', (type, callback) => {
 		        console.error("Entering pin is not supported. Unlock TREZOR in other app!");
@@ -44,6 +50,7 @@ class Trezor {
 
 	        // For convenience, device emits 'disconnect' event on disconnection.
 	        device.on('disconnect', function () {
+	            self.devices.splice(self.devices.indexOf(dev), 1);
 	            console.log("Disconnected device");
 	        });
 
@@ -55,12 +62,10 @@ class Trezor {
 	}
 
 	inTrezorSession(cb) {
-        const devices = this.list.asArray();
-        console.log(devices);
-        if (devices.length == 0) {
+        if (this.devices.length == 0) {
             return Promise.reject(new Error("no device connected"));
         } else {
-            return devices[0].waitForSessionAndRun(cb);
+            return this.devices[0].waitForSessionAndRun(cb);
         }
     }
 
@@ -96,11 +101,19 @@ class Trezor {
 		.catch(cb);
 	}
 
+	static init(path) {
+		if (trezorInstance == null) {
+			trezorInstance = new Trezor(path);
+		} else {
+			trezorInstance.path = path;
+		}
+		return trezorInstance;
+	}
 }
 
 class TrezorProvider extends HookedSubprovider {
 	constructor(path) {
-		var trezor = new Trezor(path);
+		var trezor = Trezor.init(bippath.fromString(path).toPathArray());
 		super({
 			getAccounts: function(cb) {
 				trezor.getAccounts(cb);
