@@ -1,10 +1,10 @@
-# truffle-hdwallet-provider
-HD Wallet-enabled Web3 provider. Use it to sign transactions for addresses derived from a 12-word mnemonic.
+# trezor-wallet-provider
+Trezor-enabled Web3 provider. Use it to sign transactions with Trezor hardware wallet
 
 ## Install
 
 ```
-$ npm install truffle-hdwallet-provider
+$ npm install trezor-wallet-provider
 ```
 
 ## General Usage
