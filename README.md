@@ -4,7 +4,7 @@ Trezor-enabled Web3 subprovider for [metamask's provider engine](https://github.
 ## Install
 
 ```
-$ npm install trezor-wallet-provider
+$ npm install @daonomic/trezor-wallet-provider
 ```
 
 ## General Usage
