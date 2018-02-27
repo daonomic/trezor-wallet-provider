@@ -1,7 +1,7 @@
 {
-  "name": "trezor-wallet-provider",
-  "version": "0.0.2",
-  "description": "Trezor-enabled Web3 provider",
+  "name": "@daonomic/trezor-wallet-provider",
+  "version": "0.0.1",
+  "description": "Trezor-enabled provider for Provider Engine",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/0v1se/truffle-trezor-provider#readme",
   "dependencies": {
-    "web3-provider-engine": "^8.4.0",
-    "trezor.js-node": "^5.4.3",
-    "bip32-path": "^0.4.2"
+    "bip32-path": "^0.4.2",
+    "trezor.js-node": "^5.10.7",
+    "web3-provider-engine": "^13.6.5"
   }
 }

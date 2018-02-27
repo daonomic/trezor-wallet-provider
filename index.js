@@ -1,6 +1,6 @@
 'use strict';
 
-var HookedSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js');
+var HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js');
 var Transaction = require('ethereumjs-tx');
 var trezor = require('trezor.js-node');
 var util = require('util');
@@ -111,7 +111,7 @@ class Trezor {
 	}
 }
 
-class TrezorProvider extends HookedSubprovider {
+class TrezorProvider extends HookedWalletSubprovider {
 	constructor(path) {
 		var trezor = Trezor.init(bippath.fromString(path).toPathArray());
 		super({
