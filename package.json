@@ -1,6 +1,6 @@
 {
   "name": "@daonomic/trezor-wallet-provider",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Trezor-enabled provider for Provider Engine",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/0v1se/truffle-trezor-provider.git"
+    "url": "git+https://github.com/daonomic/truffle-trezor-provider.git"
   },
   "keywords": [
     "ethereum",
@@ -19,9 +19,9 @@
   "author": "0v1se <dev@0v1se.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/0v1se/truffle-trezor-provider/issues"
+    "url": "https://github.com/daonomic/truffle-trezor-provider/issues"
   },
-  "homepage": "https://github.com/0v1se/truffle-trezor-provider#readme",
+  "homepage": "https://github.com/daonomic/truffle-trezor-provider#readme",
   "dependencies": {
     "bip32-path": "^0.4.2",
     "trezor.js-node": "^5.10.7",
