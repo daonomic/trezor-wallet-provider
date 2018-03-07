@@ -113,7 +113,8 @@ class Trezor {
 
 class TrezorProvider extends HookedWalletSubprovider {
 	constructor(path) {
-		var trezor = Trezor.init(bippath.fromString(path).toPathArray());
+		var pathArray = bippath.fromString(path).toPathArray();
+		var trezor = Trezor.init(pathArray);
 		super({
 			getAccounts: function(cb) {
 				trezor.getAccounts(cb);
@@ -122,6 +123,7 @@ class TrezorProvider extends HookedWalletSubprovider {
 				trezor.signTransaction(txParams, cb);
 			}
 		});
+		trezor.getAccounts(() => {});
 	}
 }
 
