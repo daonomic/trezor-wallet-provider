@@ -21,6 +21,10 @@ function normalize(hex) {
 	return hex;
 }
 
+function getUserHome() {
+  return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+}
+
 function buffer(hex) {
 	if (hex == null) {
 		return new Buffer('', 'hex');
@@ -48,6 +52,16 @@ class Trezor {
 		        callback(new Error());
 		    });
 
+			device.on('passphrase', callback => {
+				try {
+					var json = require(getUserHome() + "/.trezor/passphrase.json");
+					callback(null, json.passphrase);
+				} catch(err) {
+					console.log("save your passphrase to ~/.trezor/passphrase.json");
+					callback(err);
+				}
+			});
+
 	        // For convenience, device emits 'disconnect' event on disconnection.
 	        device.on('disconnect', function () {
 	            self.devices.splice(self.devices.indexOf(dev), 1);
@@ -58,6 +72,14 @@ class Trezor {
 	        if (device.isBootloader()) {
 	            throw new Error('Device is in bootloader mode, re-connected it');
 	        }
+
+		    self.getAccounts(function(err, result){
+		        if (err != null) {
+		            console.log("error getting address: " + err);
+		        } else {
+		            console.log("address: " + result);
+		        }
+		    });
 	    });
 	}
 
@@ -75,7 +97,7 @@ class Trezor {
 	        session => session.ethereumGetAddress(self.path, false)
 	    )
 	    .then(resp => "0x" + resp.message.address)
-	    .then(address => {cb(null, [address]); console.log("address: " + address)})
+	    .then(address => {cb(null, [address])})
 	    .catch(cb);
 	}
 
@@ -123,7 +145,6 @@ class TrezorProvider extends HookedWalletSubprovider {
 				trezor.signTransaction(txParams, cb);
 			}
 		});
-		trezor.getAccounts(() => {});
 	}
 }
 
