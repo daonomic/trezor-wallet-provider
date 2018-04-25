@@ -106,7 +106,7 @@ class Trezor {
 		            return this.inTrezorSession(device, session => session.ethereumGetAddress(self.path, false))
                         .then(resp => "0x" + resp.message.address)
                         .then(address => {
-                            accountsMap[device.features.device_id] = [address];
+                            accountsMap[device.features.device_id] = address;
                             return address;
                         });
 		        } else {
