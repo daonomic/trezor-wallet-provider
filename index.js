@@ -32,7 +32,7 @@ function execute(command, callback){
 };
 
 function getUserHome() {
-  return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+	return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }
 
 function buffer(hex) {
