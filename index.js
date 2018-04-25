@@ -34,6 +34,7 @@ function buffer(hex) {
 }
 
 var trezorInstance;
+var accountsMap = {};
 
 class Trezor {
 	constructor(path) {
@@ -73,7 +74,7 @@ class Trezor {
 	            throw new Error('Device is in bootloader mode, re-connected it');
 	        }
 
-		    self.getAccounts(function(err, result){
+		    self.getAccounts(function(err, result) {
 		        if (err != null) {
 		            console.log("error getting address: " + err);
 		        } else {
@@ -83,44 +84,58 @@ class Trezor {
 	    });
 	}
 
-	inTrezorSession(cb) {
-        if (this.devices.length == 0) {
-            return Promise.reject(new Error("no device connected"));
-        } else {
-            return this.devices[0].waitForSessionAndRun(cb);
-        }
+	checkOneDeviceConnected() {
+	    if (this.devices.length == 0) {
+	        return Promise.reject(new Error("no device connected"));
+	    } else if (this.devices.length > 1){
+	        return Promise.reject(new Error("more than one device connected"));
+	    } else {
+	        return Promise.resolve(this.devices[0]);
+	    }
+	}
+
+	inTrezorSession(device, cb) {
+	    return device.waitForSessionAndRun(cb);
     }
 
 	getAccounts(cb) {
 		var self = this;
-	    this.inTrezorSession(
-	        session => session.ethereumGetAddress(self.path, false)
-	    )
-	    .then(resp => "0x" + resp.message.address)
-	    .then(address => {cb(null, [address])})
-	    .catch(cb);
+		this.checkOneDeviceConnected()
+		    .then(device => {
+		        if (accountsMap[device.features.device_id] == null) {
+		            return this.inTrezorSession(device, session => session.ethereumGetAddress(self.path, false))
+                        .then(resp => "0x" + resp.message.address)
+                        .then(address => {
+                            accountsMap[device.features.device_id] = [address];
+                            return address;
+                        });
+		        } else {
+		            return Promise.resolve(accountsMap[device.features.device_id]);
+		        }
+		    })
+            .then(address => {cb(null, [address])})
+	        .catch(cb);
 	}
 
 	signTransaction(txParams, cb) {
 		var self = this;
-		this.inTrezorSession(
-			session => session.signEthTx(self.path, normalize(txParams.nonce), normalize(txParams.gasPrice), normalize(txParams.gas), normalize(txParams.to), normalize(txParams.value), normalize(txParams.data))
-		)
-		.then(result => {
-			const tx = new Transaction({
-			   nonce: buffer(txParams.nonce),
-			   gasPrice: buffer(txParams.gasPrice),
-			   gasLimit: buffer(txParams.gas),
-			   to: buffer(txParams.to),
-			   value: buffer(txParams.value),
-			   data: buffer(txParams.data),
-			   v: result.v,
-			   r: buffer(result.r),
-			   s: buffer(result.s)
-			});
-			cb(null, '0x' + tx.serialize().toString('hex'));
-		})
-		.catch(cb);
+		this.checkOneDeviceConnected()
+		    .then(device => this.inTrezorSession(device, session => session.signEthTx(self.path, normalize(txParams.nonce), normalize(txParams.gasPrice), normalize(txParams.gas), normalize(txParams.to), normalize(txParams.value), normalize(txParams.data))))
+    		.then(result => {
+                const tx = new Transaction({
+                   nonce: buffer(txParams.nonce),
+                   gasPrice: buffer(txParams.gasPrice),
+                   gasLimit: buffer(txParams.gas),
+                   to: buffer(txParams.to),
+                   value: buffer(txParams.value),
+                   data: buffer(txParams.data),
+                   v: result.v,
+                   r: buffer(result.r),
+                   s: buffer(result.s)
+                });
+                cb(null, '0x' + tx.serialize().toString('hex'));
+    		})
+		    .catch(cb);
 	}
 
 	static init(path) {
