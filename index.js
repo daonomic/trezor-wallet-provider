@@ -21,6 +21,16 @@ function normalize(hex) {
 	return hex;
 }
 
+var exec = require('child_process').exec;
+function execute(command, callback){
+	exec(command, function(error, stdout, stderr) {
+		if (error != null) {
+			console.log(error);
+		}
+        callback(stdout);
+    });
+};
+
 function getUserHome() {
   return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }
@@ -34,93 +44,63 @@ function buffer(hex) {
 }
 
 var trezorInstance;
-var accountsMap = {};
 
 class Trezor {
 	constructor(path) {
 		var self = this;
 
+		this.accountsMap = {};
 		this.devices = [];
 		this.path = path;
 		this.list = new trezor.DeviceList({debug: debug});
-		this.list.on('connect', function (device) {
-			var dev = device;
-	        console.log("Connected device " + device.features.label);
-	        self.devices.push(device);
+	    this.list.acquireFirstDevice().then(obj => {
+	        self.device = obj.device;
+	        self.session = obj.session;
 
-		    device.on('pin', (type, callback) => {
+            obj.device.on('passphrase', callback => {
+                execute("java -cp " + require.resolve("./ui-0.1.0.jar") + " io.daonomic.trezor.AskPassphrase", out => callback(null, out.trim()));
+            });
+
+		    obj.device.on('pin', (type, callback) => {
 		        console.error("Entering pin is not supported. Unlock TREZOR in other app!");
 		        callback(new Error());
 		    });
 
-			device.on('passphrase', callback => {
-				try {
-					var json = require(getUserHome() + "/.trezor/passphrase.json");
-					callback(null, json.passphrase);
-				} catch(err) {
-					console.log("save your passphrase to ~/.trezor/passphrase.json");
-					callback(err);
-				}
-			});
+            // For convenience, device emits 'disconnect' event on disconnection.
+            obj.device.on('disconnect', function () {
+                console.log("Disconnected device");
+                self.device = null;
+                self.session = null;
+            });
 
-	        // For convenience, device emits 'disconnect' event on disconnection.
-	        device.on('disconnect', function () {
-	            self.devices.splice(self.devices.indexOf(dev), 1);
-	            console.log("Disconnected device");
-	        });
-
-	        // You generally want to filter out devices connected in bootloader mode:
-	        if (device.isBootloader()) {
-	            throw new Error('Device is in bootloader mode, re-connected it');
-	        }
-
-		    self.getAccounts(function(err, result) {
-		        if (err != null) {
-		            console.log("error getting address: " + err);
-		        } else {
-		            console.log("address: " + result);
-		        }
-		    });
-	    });
+	        obj.session.ethereumGetAddress(self.path, false)
+	            .then(resp => "0x" + resp.message.address)
+	            .then(address => console.log("Current address: " + address))
+	            .catch(console.log)
+	    }).catch(console.log);
 	}
 
-	checkOneDeviceConnected() {
-	    if (this.devices.length == 0) {
-	        return Promise.reject(new Error("no device connected"));
-	    } else if (this.devices.length > 1){
-	        return Promise.reject(new Error("more than one device connected"));
-	    } else {
-	        return Promise.resolve(this.devices[0]);
-	    }
+	checkSession() {
+		if (this.session != null) {
+			return Promise.resolve(this.session);
+		} else {
+			return Promise.reject("No session opened");
+		}
 	}
-
-	inTrezorSession(device, cb) {
-	    return device.waitForSessionAndRun(cb);
-    }
 
 	getAccounts(cb) {
 		var self = this;
-		this.checkOneDeviceConnected()
-		    .then(device => {
-		        if (accountsMap[device.features.device_id] == null) {
-		            return this.inTrezorSession(device, session => session.ethereumGetAddress(self.path, false))
-                        .then(resp => "0x" + resp.message.address)
-                        .then(address => {
-                            accountsMap[device.features.device_id] = address;
-                            return address;
-                        });
-		        } else {
-		            return Promise.resolve(accountsMap[device.features.device_id]);
-		        }
-		    })
-            .then(address => {cb(null, [address])})
-	        .catch(cb);
+		this.checkSession()
+			.then(session => session.ethereumGetAddress(self.path, false))
+			.then(resp => "0x" + resp.message.address)
+			.then(address => {cb(null, [address])})
+			.catch(cb)
 	}
 
 	signTransaction(txParams, cb) {
 		var self = this;
-		this.checkOneDeviceConnected()
-		    .then(device => this.inTrezorSession(device, session => session.signEthTx(self.path, normalize(txParams.nonce), normalize(txParams.gasPrice), normalize(txParams.gas), normalize(txParams.to), normalize(txParams.value), normalize(txParams.data))))
+		this.checkSession()
+			.then(session => session.signEthTx(self.path, normalize(txParams.nonce), normalize(txParams.gasPrice), normalize(txParams.gas), normalize(txParams.to), normalize(txParams.value), normalize(txParams.data)))
     		.then(result => {
                 const tx = new Transaction({
                    nonce: buffer(txParams.nonce),
