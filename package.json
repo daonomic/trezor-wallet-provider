@@ -1,6 +1,6 @@
 {
   "name": "@daonomic/trezor-wallet-provider",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Trezor-enabled subprovider for Provider Engine",
   "main": "index.js",
   "scripts": {

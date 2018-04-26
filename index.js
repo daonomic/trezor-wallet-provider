@@ -22,12 +22,15 @@ function normalize(hex) {
 }
 
 var exec = require('child_process').exec;
-function execute(command, callback){
-	exec(command, function(error, stdout, stderr) {
-		if (error != null) {
-			console.log(error);
-		}
-        callback(stdout);
+function execute(command) {
+    return new Promise((resolve, reject) => {
+        exec(command, function(error, stdout, stderr) {
+            if (error != null) {
+                reject(error);
+            } else {
+                resolve(stdout);
+            }
+        });
     });
 };
 
@@ -58,12 +61,15 @@ class Trezor {
 	        self.session = obj.session;
 
             obj.device.on('passphrase', callback => {
-                execute("java -cp " + require.resolve("./ui-0.1.0.jar") + " io.daonomic.trezor.AskPassphrase", out => callback(null, out.trim()));
+                execute("java -cp " + require.resolve("./ui-0.1.0.jar") + " io.daonomic.trezor.AskPassphrase")
+                    .then(out => callback(null, out.trim()))
+                    .catch(callback);
             });
 
 		    obj.device.on('pin', (type, callback) => {
-		        console.error("Entering pin is not supported. Unlock TREZOR in other app!");
-		        callback(new Error());
+		        execute("java -cp " + require.resolve("./ui-0.1.0.jar") + " io.daonomic.trezor.AskPin")
+                    .then(out => callback(null, out.trim()))
+                    .catch(callback);
 		    });
 
             // For convenience, device emits 'disconnect' event on disconnection.
@@ -75,7 +81,7 @@ class Trezor {
 
 	        obj.session.ethereumGetAddress(self.path, false)
 	            .then(resp => "0x" + resp.message.address)
-	            .then(address => console.log("Current address: " + address))
+	            .then(address => console.log("Current address: " + address + "\n"))
 	            .catch(console.log)
 	    }).catch(console.log);
 	}
