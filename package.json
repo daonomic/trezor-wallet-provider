@@ -2,9 +2,9 @@
   "name": "@daonomic/trezor-wallet-provider",
   "version": "0.0.9",
   "description": "Trezor-enabled subprovider for Provider Engine",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tape -r ts-node/register src/**/*.test.ts"
   },
   "repository": {
     "type": "git",
@@ -23,9 +23,22 @@
   },
   "homepage": "https://github.com/daonomic/trezor-wallet-provider#readme",
   "dependencies": {
+    "@types/ethereumjs-tx": "^1.0.0",
+    "@types/web3-provider-engine": "^14.0.0",
     "bip32-path": "^0.4.2",
-    "trezor.js-node": "6.11.3",
-    "web3-provider-engine": "14.0.5",
-    "child_process": "1.0.2"
+    "child_process": "1.0.2",
+    "trezor.js": "^6.17.6",
+    "web3-provider-engine": "14.0.5"
+  },
+  "devDependencies": {
+    "@0xproject/typescript-typings": "^1.0.5",
+    "@types/bn.js": "^4.11.1",
+    "@types/tape": "^4.2.32",
+    "tape": "^4.9.1",
+    "ts-node": "^6",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^3.0.3",
+    "web3": "^0.20"
   }
 }
