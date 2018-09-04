@@ -5,7 +5,8 @@
   "main": "build/index.js",
   "scripts": {
     "test": "tape -r ts-node/register src/**/*.test.ts",
-    "build": "tsc -d"
+    "build": "tsc -d",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",

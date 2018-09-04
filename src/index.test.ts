@@ -12,10 +12,10 @@ test('It should get some accounts', async (assert) => {
   const web3 = new Web3(engine)
 
   engine.addProvider(new FilterSubprovider())
-  engine.addProvider(createTrezorProvider('m/44\'/1\'/0\'/0/0'))
+  engine.addProvider(createTrezorProvider("m/44'/1'/0'/0/0"))
   engine.addProvider(
     new RpcSubprovider({
-      rpcUrl: 'http://localhost:8565/',
+      rpcUrl: 'http://localhost:8545/',
     })
   )
   engine.start()

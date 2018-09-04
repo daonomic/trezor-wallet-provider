@@ -1,25 +1,36 @@
 # trezor-wallet-provider
-Trezor-enabled Web3 subprovider for [metamask's provider engine](https://github.com/MetaMask/provider-engine). Use it to sign transactions with Trezor hardware wallet
+
+Trezor-enabled Web3 subprovider for [metamask's provider engine](https://github.com/MetaMask/provider-engine). Use it to sign transactions with Trezor hardware wallet.
+
+This is based on https://github.com/daonomic/trezor-wallet-provider
 
 ## Install
 
 ```
-$ npm install @daonomic/trezor-wallet-provider
+$ npm install @hardfork/trezor-wallet-provider
 ```
 
 ## General Usage
 
+**Please also read the tests files!**
+
 You can use this subprovider to sign transaction using trezor hardware wallet.
 
 ```javascript
-var engine = new ProviderEngine();
-engine.addProvider(new TrezorProvider("m/44'/1'/0'/0/0"));
-engine.addProvider(new FiltersSubprovider());
-engine.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider("http://ropsten.infura.com/{key}")));
-engine.start();
+import { createTrezorProvider } from '@hardfork/trezor-wallet-provider'
+
+var engine = new ProviderEngine()
+engine.addProvider(createTrezorProvider("m/44'/1'/0'/0/0"))
+engine.addProvider(new FiltersSubprovider())
+engine.addProvider(
+  new Web3Subprovider(
+    new Web3.providers.HttpProvider('http://ropsten.infura.com/{key}')
+  )
+)
+engine.start()
 ```
 
-TrezorProvider will expose one address for specified path
+TrezorProvider will expose one address for specified path.
 
 Parameters:
 
