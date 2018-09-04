@@ -1,10 +1,11 @@
 {
-  "name": "@daonomic/trezor-wallet-provider",
+  "name": "@levino/trezor-wallet-provider",
   "version": "0.0.9",
   "description": "Trezor-enabled subprovider for Provider Engine",
   "main": "build/index.js",
   "scripts": {
-    "test": "tape -r ts-node/register src/**/*.test.ts"
+    "test": "tape -r ts-node/register src/**/*.test.ts",
+    "build": "tsc -d"
   },
   "repository": {
     "type": "git",

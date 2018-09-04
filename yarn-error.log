@@ -1,5 +1,5 @@
 Arguments: 
-  /home/levin/.nvm/versions/node/v8.11.2/bin/node /usr/share/yarn/bin/yarn.js add -D @types/trezor.js
+  /home/levin/.nvm/versions/node/v8.11.2/bin/node /usr/share/yarn/bin/yarn.js add -D @types/bip32-path
 
 PATH: 
   /home/levin/gems/bin:/home/levin/gems/bin:/home/levin/.nvm/versions/node/v8.11.2/bin:/home/levin/bin:/home/levin/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
@@ -14,7 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.npmjs.org/@types%2ftrezor.js: Not found
+  Error: https://registry.npmjs.org/@types%2fbip32-path: Not found
       at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:64202:18)
       at Request.self.callback (/usr/share/yarn/lib/cli.js:137468:22)
       at emitTwo (events.js:126:13)
@@ -31,9 +31,9 @@ npm manifest:
     "name": "@daonomic/trezor-wallet-provider",
     "version": "0.0.9",
     "description": "Trezor-enabled subprovider for Provider Engine",
-    "main": "index.js",
+    "main": "build/index.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+      "test": "tape -r ts-node/register src/**/*.test.ts"
     },
     "repository": {
       "type": "git",
@@ -52,14 +52,23 @@ npm manifest:
     },
     "homepage": "https://github.com/daonomic/trezor-wallet-provider#readme",
     "dependencies": {
+      "@types/ethereumjs-tx": "^1.0.0",
+      "@types/web3-provider-engine": "^14.0.0",
       "bip32-path": "^0.4.2",
       "child_process": "1.0.2",
       "trezor.js": "^6.17.6",
       "web3-provider-engine": "14.0.5"
     },
     "devDependencies": {
+      "@0xproject/typescript-typings": "^1.0.5",
+      "@types/bn.js": "^4.11.1",
+      "@types/tape": "^4.2.32",
+      "tape": "^4.9.1",
+      "ts-node": "^6",
       "tslint": "^5.11.0",
-      "typescript": "^3.0.3"
+      "tslint-config-prettier": "^1.15.0",
+      "typescript": "^3.0.3",
+      "web3": "^0.20"
     }
   }
 
@@ -71,15 +80,76 @@ Lockfile:
   # yarn lockfile v1
   
   
+  "@0xproject/typescript-typings@^1.0.5":
+    version "1.0.5"
+    resolved "https://registry.npmjs.org/@0xproject/typescript-typings/-/typescript-typings-1.0.5.tgz#a808443419f26a7b90d63d1afd3efbfb48644184"
+    dependencies:
+      "@types/bn.js" "^4.11.0"
+      "@types/react" "*"
+      bignumber.js "~4.1.0"
+      ethereum-types "^1.0.5"
+      popper.js "1.14.3"
+  
+  "@types/bn.js@^4.11.0", "@types/bn.js@^4.11.1":
+    version "4.11.1"
+    resolved "https://registry.npmjs.org/@types/bn.js/-/bn.js-4.11.1.tgz#6fd07b93490ecf0f3501a31ea9cfd330885b10fa"
+    dependencies:
+      "@types/node" "*"
+  
   "@types/commander@^2.11.0":
     version "2.12.2"
     resolved "https://registry.npmjs.org/@types/commander/-/commander-2.12.2.tgz#183041a23842d4281478fa5d23c5ca78e6fd08ae"
     dependencies:
       commander "*"
   
+  "@types/ethereum-protocol@*":
+    version "1.0.0"
+    resolved "https://registry.npmjs.org/@types/ethereum-protocol/-/ethereum-protocol-1.0.0.tgz#416e3827d5fdfa4658b0045b35a008747871b271"
+    dependencies:
+      bignumber.js "7.2.1"
+  
+  "@types/ethereumjs-tx@^1.0.0":
+    version "1.0.0"
+    resolved "https://registry.npmjs.org/@types/ethereumjs-tx/-/ethereumjs-tx-1.0.0.tgz#ae2ce90a145cc1a6849656db38baf0e793ff7927"
+    dependencies:
+      "@types/node" "*"
+  
+  "@types/node@*":
+    version "10.9.4"
+    resolved "https://registry.npmjs.org/@types/node/-/node-10.9.4.tgz#0f4cb2dc7c1de6096055357f70179043c33e9897"
+  
+  "@types/node@^8.0.53":
+    version "8.10.29"
+    resolved "https://registry.npmjs.org/@types/node/-/node-8.10.29.tgz#b3a13b58dd7b0682bf1b42022bef4a5a9718f687"
+  
+  "@types/prop-types@*":
+    version "15.5.5"
+    resolved "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.5.5.tgz#17038dd322c2325f5da650a94d5f9974943625e3"
+    dependencies:
+      "@types/react" "*"
+  
+  "@types/react@*":
+    version "16.4.13"
+    resolved "https://registry.npmjs.org/@types/react/-/react-16.4.13.tgz#1385f5dc3486aa493849a32ccce626a817543e28"
+    dependencies:
+      "@types/prop-types" "*"
+      csstype "^2.2.0"
+  
   "@types/semver@^5.4.0":
     version "5.5.0"
     resolved "https://registry.npmjs.org/@types/semver/-/semver-5.5.0.tgz#146c2a29ee7d3bae4bf2fcb274636e264c813c45"
+  
+  "@types/tape@^4.2.32":
+    version "4.2.32"
+    resolved "https://registry.npmjs.org/@types/tape/-/tape-4.2.32.tgz#1188330d22c4e822648c344faa070277737982d9"
+    dependencies:
+      "@types/node" "*"
+  
+  "@types/web3-provider-engine@^14.0.0":
+    version "14.0.0"
+    resolved "https://registry.npmjs.org/@types/web3-provider-engine/-/web3-provider-engine-14.0.0.tgz#43adc3b39dc9812b82aef8cd2d66577665ad59b0"
+    dependencies:
+      "@types/ethereum-protocol" "*"
   
   abbrev@1:
     version "1.1.1"
@@ -125,6 +195,10 @@ Lockfile:
     resolved "https://registry.npmjs.org/argparse/-/argparse-1.0.10.tgz#bcd6791ea5ae09725e17e5ad988134cd40b3d911"
     dependencies:
       sprintf-js "~1.0.2"
+  
+  arrify@^1.0.0:
+    version "1.0.1"
+    resolved "https://registry.npmjs.org/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
   
   ascli@~0.3:
     version "0.3.0"
@@ -691,6 +765,18 @@ Lockfile:
     version "1.4.2"
     resolved "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz#9c665a95f88b8b08fc05cfd731f561859d725825"
   
+  bignumber.js@7.2.1:
+    version "7.2.1"
+    resolved "https://registry.npmjs.org/bignumber.js/-/bignumber.js-7.2.1.tgz#80c048759d826800807c4bfd521e50edbba57a5f"
+  
+  "bignumber.js@git+https://github.com/frozeman/bignumber.js-nolookahead.git":
+    version "2.0.7"
+    resolved "git+https://github.com/frozeman/bignumber.js-nolookahead.git#57692b3ecfc98bbdd6b3a516cb2353652ea49934"
+  
+  bignumber.js@~4.1.0:
+    version "4.1.0"
+    resolved "https://registry.npmjs.org/bignumber.js/-/bignumber.js-4.1.0.tgz#db6f14067c140bd46624815a7916c92d9b6c24b1"
+  
   bindings@^1.2.1:
     version "1.3.0"
     resolved "https://registry.npmjs.org/bindings/-/bindings-1.3.0.tgz#b346f6ecf6a95f5a815c5839fc7cdb22502f1ed7"
@@ -802,7 +888,7 @@ Lockfile:
       create-hash "^1.1.0"
       safe-buffer "^5.1.2"
   
-  buffer-from@^1.0.0:
+  buffer-from@^1.0.0, buffer-from@^1.1.0:
     version "1.1.1"
     resolved "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"
   
@@ -973,6 +1059,10 @@ Lockfile:
     version "0.1.0"
     resolved "https://registry.npmjs.org/convert-string/-/convert-string-0.1.0.tgz#79ce41a9bb0d03bcf72cdc6a8f3c56fbbc64410a"
   
+  cookiejar@^2.1.1:
+    version "2.1.2"
+    resolved "https://registry.npmjs.org/cookiejar/-/cookiejar-2.1.2.tgz#dd8a235530752f988f9a0844f3fc589e3111125c"
+  
   core-js@^2.4.0, core-js@^2.5.0:
     version "2.5.7"
     resolved "https://registry.npmjs.org/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
@@ -1020,6 +1110,14 @@ Lockfile:
       binstring "0.2.x"
       ripemd160 "~0.2.0"
   
+  crypto-js@^3.1.4:
+    version "3.1.8"
+    resolved "https://registry.npmjs.org/crypto-js/-/crypto-js-3.1.8.tgz#715f070bf6014f2ae992a98b3929258b713f08d5"
+  
+  csstype@^2.2.0:
+    version "2.5.6"
+    resolved "https://registry.npmjs.org/csstype/-/csstype-2.5.6.tgz#2ae1db2319642d8b80a668d2d025c6196071e788"
+  
   dashdash@^1.12.0:
     version "1.14.1"
     resolved "https://registry.npmjs.org/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
@@ -1066,7 +1164,7 @@ Lockfile:
     dependencies:
       repeating "^2.0.0"
   
-  diff@^3.2.0:
+  diff@^3.1.0, diff@^3.2.0:
     version "3.5.0"
     resolved "https://registry.npmjs.org/diff/-/diff-3.5.0.tgz#800c0dd1e0a8bfbc95835c202ad220fe317e5a12"
   
@@ -1297,6 +1395,13 @@ Lockfile:
   ethereum-common@^0.0.18:
     version "0.0.18"
     resolved "https://registry.npmjs.org/ethereum-common/-/ethereum-common-0.0.18.tgz#2fdc3576f232903358976eb39da783213ff9523f"
+  
+  ethereum-types@^1.0.5:
+    version "1.0.5"
+    resolved "https://registry.npmjs.org/ethereum-types/-/ethereum-types-1.0.5.tgz#4d2541d9fe90adf5969503eb90315d1f8340fde7"
+    dependencies:
+      "@types/node" "^8.0.53"
+      bignumber.js "~4.1.0"
   
   "ethereumjs-abi@git+https://github.com/ethereumjs/ethereumjs-abi.git":
     version "0.6.5"
@@ -1888,6 +1993,10 @@ Lockfile:
     version "2.2.1"
     resolved "https://registry.npmjs.org/ltgt/-/ltgt-2.2.1.tgz#f35ca91c493f7b73da0e07495304f17b31f87ee5"
   
+  make-error@^1.1.1:
+    version "1.3.5"
+    resolved "https://registry.npmjs.org/make-error/-/make-error-1.3.5.tgz#efe4e81f6db28cadd605c70f29c831b58ef776c8"
+  
   md5.js@^1.3.4:
     version "1.3.4"
     resolved "https://registry.npmjs.org/md5.js/-/md5.js-1.3.4.tgz#e9bdbde94a20a5ac18b04340fc5764d5b09d901d"
@@ -1961,7 +2070,7 @@ Lockfile:
     version "0.0.8"
     resolved "http://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz#857fcabfc3397d2625b8228262e86aa7a011b05d"
   
-  minimist@~1.2.0:
+  minimist@^1.2.0, minimist@~1.2.0:
     version "1.2.0"
     resolved "http://registry.npmjs.org/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
   
@@ -2122,6 +2231,10 @@ Lockfile:
   pinkie@^2.0.0:
     version "2.0.4"
     resolved "https://registry.npmjs.org/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
+  
+  popper.js@1.14.3:
+    version "1.14.3"
+    resolved "https://registry.npmjs.org/popper.js/-/popper.js-1.14.3.tgz#1438f98d046acf7b4d78cd502bf418ac64d4f095"
   
   precond@0.2:
     version "0.2.3"
@@ -2458,9 +2571,20 @@ Lockfile:
     dependencies:
       source-map "^0.5.6"
   
+  source-map-support@^0.5.6:
+    version "0.5.9"
+    resolved "https://registry.npmjs.org/source-map-support/-/source-map-support-0.5.9.tgz#41bc953b2534267ea2d605bccfa7bfa3111ced5f"
+    dependencies:
+      buffer-from "^1.0.0"
+      source-map "^0.6.0"
+  
   source-map@^0.5.6, source-map@^0.5.7:
     version "0.5.7"
     resolved "https://registry.npmjs.org/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
+  
+  source-map@^0.6.0:
+    version "0.6.1"
+    resolved "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   
   spdx-correct@^3.0.0:
     version "3.0.0"
@@ -2557,7 +2681,7 @@ Lockfile:
     dependencies:
       has-flag "^3.0.0"
   
-  tape@^4.4.0, tape@^4.6.3, tape@^4.8.0:
+  tape@^4.4.0, tape@^4.6.3, tape@^4.8.0, tape@^4.9.1:
     version "4.9.1"
     resolved "https://registry.npmjs.org/tape/-/tape-4.9.1.tgz#1173d7337e040c76fbf42ec86fcabedc9b3805c9"
     dependencies:
@@ -2637,9 +2761,26 @@ Lockfile:
     version "0.0.1"
     resolved "https://registry.npmjs.org/trim/-/trim-0.0.1.tgz#5858547f6b290757ee95cccc666fb50084c460dd"
   
+  ts-node@^6:
+    version "6.2.0"
+    resolved "https://registry.npmjs.org/ts-node/-/ts-node-6.2.0.tgz#65a0ae2acce319ea4fd7ac8d7c9f1f90c5da6baf"
+    dependencies:
+      arrify "^1.0.0"
+      buffer-from "^1.1.0"
+      diff "^3.1.0"
+      make-error "^1.1.1"
+      minimist "^1.2.0"
+      mkdirp "^0.5.1"
+      source-map-support "^0.5.6"
+      yn "^2.0.0"
+  
   tslib@^1.8.0, tslib@^1.8.1:
     version "1.9.3"
     resolved "https://registry.npmjs.org/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
+  
+  tslint-config-prettier@^1.15.0:
+    version "1.15.0"
+    resolved "https://registry.npmjs.org/tslint-config-prettier/-/tslint-config-prettier-1.15.0.tgz#76b9714399004ab6831fdcf76d89b73691c812cf"
   
   tslint@^5.11.0:
     version "5.11.0"
@@ -2689,6 +2830,10 @@ Lockfile:
   unorm@^1.3.3:
     version "1.4.1"
     resolved "https://registry.npmjs.org/unorm/-/unorm-1.4.1.tgz#364200d5f13646ca8bcd44490271335614792300"
+  
+  utf8@^2.1.1:
+    version "2.1.2"
+    resolved "https://registry.npmjs.org/utf8/-/utf8-2.1.2.tgz#1fa0d9270e9be850d9b05027f63519bf46457d96"
   
   util-deprecate@~1.0.1:
     version "1.0.2"
@@ -2769,6 +2914,16 @@ Lockfile:
       xhr "^2.2.0"
       xtend "^4.0.1"
   
+  web3@^0.20:
+    version "0.20.7"
+    resolved "https://registry.npmjs.org/web3/-/web3-0.20.7.tgz#1605e6d81399ed6f85a471a4f3da0c8be57df2f7"
+    dependencies:
+      bignumber.js "git+https://github.com/frozeman/bignumber.js-nolookahead.git"
+      crypto-js "^3.1.4"
+      utf8 "^2.1.1"
+      xhr2-cookies "^1.1.0"
+      xmlhttprequest "*"
+  
   whatwg-fetch@0.11.0:
     version "0.11.0"
     resolved "https://registry.npmjs.org/whatwg-fetch/-/whatwg-fetch-0.11.0.tgz#46b1d18d0aa99955971ef1a2f5aac506add28815"
@@ -2808,6 +2963,12 @@ Lockfile:
     dependencies:
       async-limiter "~1.0.0"
   
+  xhr2-cookies@^1.1.0:
+    version "1.1.0"
+    resolved "https://registry.npmjs.org/xhr2-cookies/-/xhr2-cookies-1.1.0.tgz#7d77449d0999197f155cb73b23df72505ed89d48"
+    dependencies:
+      cookiejar "^2.1.1"
+  
   xhr@^2.2.0:
     version "2.5.0"
     resolved "https://registry.npmjs.org/xhr/-/xhr-2.5.0.tgz#bed8d1676d5ca36108667692b74b316c496e49dd"
@@ -2816,6 +2977,10 @@ Lockfile:
       is-function "^1.0.1"
       parse-headers "^2.0.0"
       xtend "^4.0.0"
+  
+  xmlhttprequest@*:
+    version "1.8.0"
+    resolved "https://registry.npmjs.org/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
   
   xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.0, xtend@~4.0.1:
     version "4.0.1"
@@ -2860,3 +3025,7 @@ Lockfile:
       window-size "^0.2.0"
       y18n "^3.2.1"
       yargs-parser "^2.4.1"
+  
+  yn@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
