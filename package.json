@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daonomic/trezor-wallet-provider.git"
+    "url": "git+https://github.com/hardforkio/trezor-wallet-provider.git"
   },
   "keywords": [
     "ethereum",
@@ -20,12 +20,21 @@
     "wallet",
     "provider"
   ],
-  "author": "0v1se <dev@0v1se.com>",
+  "author": "Hardfork GmbH <contact@hardfork.io>",
+  "contributors": [
+    {
+      "name": "Tim Coulter"
+    },
+    {
+      "email": "post@levinkeller.de",
+      "name": "Levin Keller"
+    }
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/daonomic/trezor-wallet-provider/issues"
+    "url": "https://github.com/hardforkio/trezor-wallet-provider/issues"
   },
-  "homepage": "https://github.com/daonomic/trezor-wallet-provider#readme",
+  "homepage": "https://github.com/hardforkio/trezor-wallet-provider#readme",
   "dependencies": {
     "@types/ethereumjs-tx": "^1.0.0",
     "@types/web3-provider-engine": "^14.0.0",
