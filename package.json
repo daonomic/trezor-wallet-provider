@@ -1,6 +1,6 @@
 {
   "name": "@levino/trezor-wallet-provider",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Trezor-enabled subprovider for Provider Engine",
   "main": "build/index.js",
   "scripts": {
