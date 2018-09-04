@@ -1,4 +1,11 @@
 node_modules
 .idea
 *.iml
-ui
+src
+types
+.vscode
+.gitignore
+.prettierrc
+tsconfig.json
+tslint.json
+yarn.lock
